@@ -2,7 +2,6 @@ import pygame
 import random
 import time
 
-
 pygame.init()
 pygame.font.init()
 pygame.display.set_caption('Snake Game')
@@ -36,6 +35,7 @@ class Player:
 		self.delta_y = 0
 		# up = 1, down = 2, left = 3, right = 4
 		self.direction = direction
+	# detect collistion between player head and food
 	def detect_collision(self, food):
 		if (self.x < food.x + food.width and \
 			self.x + self.width > food.x and \
@@ -93,19 +93,25 @@ def update_screen():
 		player.append(Player(game, player[-1].x+diffx, player[-1].y+diffy, player[-1].direction))
 		game.increase_length = False
 	game.screen.fill((255, 255, 255))
+
+	# render score
 	myfont = pygame.font.SysFont('Segoe UI', 40)
-	# myfont_bold = pygame.font.Font('Segoe UI', 20, True)
 	text_score = myfont.render('SCORE: ', True, (0, 0, 0))
 	text_score_number = myfont.render(str(game.score), True, (0, 0, 0))
 	game.screen.blit(text_score, (5, window_height-30))
 	game.screen.blit(text_score_number, (120, window_height-30))
 	game.screen.blit(game.background_image, [10, 10])
 	game.screen.blit(food.image, (food.x, food.y))
+	
+	# update player position
 	for i in reversed(range(1,len(player))):
 		player[i].update(player[i-1].x, player[i-1].y)
 		game.screen.blit(player[i].image, (player[i].x, player[i].y))
 	player[0].move(food)
 	player[0].update(player[0].x, player[0].y)
+	for i in range(1,len(player)):
+		if player[i].x == player[0].x and player[i].y == player[0].y:
+			game.game_over = True
 	game.screen.blit(player[0].image, (player[0].x, player[0].y))
 	pygame.display.update()
 	
@@ -123,9 +129,9 @@ def event_handler(events):
 		except:
 			pass
 game = Game(window_width, window_height)
+# head of snake
 player.append(Player(game, 0.5 * game.window_width, 0.5 * game.window_height))
 food = Food(game)
-run = True
 while game.game_over == False:
 	events = pygame.event.get()
 	event_handler(events)
