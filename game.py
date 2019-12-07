@@ -136,39 +136,40 @@ def init(agent, game, player, food):
 	event_handler(player, np.argmax(np.array(action)))
 	state_init2 = agent.get_state(game, player, food)
 	reward = agent.set_reward(game)
-	agent.memoize(state_init1, action, reward, state_init2, game)
+	# print(reward)
+	agent.memoize(state_init1, action, reward, state_init2, game.game_over)
 	agent.replay_new(agent.memory)
 
 num_games = 0
-while num_games < 1:
-	if num_games > 0:
-		init(agent, game, player, food)
+while num_games < 200:
 	num_games += 1
 	player = []
 	game = Game(window_width, window_height)
 	player.append(Player(game, 0.5 * game.window_width, 0.5 * game.window_height))
 	food = Food(game)
+	init(agent, game, player, food)
 	while game.game_over == False:
 		# for random moves
 		agent.epsilon = 80 - num_games
 		old_state = agent.get_state(game, player, food)
 
 		if random.randint(0, 200) < agent.epsilon:
-			new_direction = to_categorical(random.randint(0, 2), num_classes=5)
+			new_direction = to_categorical(random.randint(0, 4), num_classes=5)
 		else:
-			predict = agent.model.predict(old_state.reshape((1,12)))
+			predict = agent.model.predict(old_state.reshape((1,13)))
 			new_direction = to_categorical(np.argmax(predict[0]), num_classes=5)
-             
 		# perform move  
 		event_handler(player, np.argmax(np.array(new_direction)))
+		
+		update_screen()
+
 		new_state = agent.get_state(game, player, food)
         
 		reward = agent.set_reward(game)
 		agent.train_model(old_state, new_direction, reward, new_state, game.game_over)
-
-		update_screen()
-		clock.tick(60)
-		time.sleep(3)
+		# print(reward)
+		agent.memoize(old_state, new_direction, reward, new_state, game.game_over)
+		clock.tick(360)
 
 	agent.replay_new(agent.memory)
 	print('Game', num_games, '      Score:', game.score)

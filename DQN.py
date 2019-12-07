@@ -8,7 +8,7 @@ class DQNAgent:
 	def __init__(self):
 		self.reward = 0
 		self.gamma = 0.9
-		self.learning_rate = 0.0005
+		self.learning_rate = 0.00005
 		self.model = self.network()
 		self.memory = []
 
@@ -22,7 +22,7 @@ class DQNAgent:
 		return 0
 
 	def get_state(self, game, player, food):
-		state = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+		state = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 		# danger up
 		x, y = player[0].x, player[0].y - 20
 		state[0] = self.check(game, player, x, y)
@@ -51,9 +51,12 @@ class DQNAgent:
 		state[10] = (food.y > player[0].y)	
 		#food above player
 		state[11] = (food.y < player[0].y)
+		# direction
+		state[12] = player[0].direction
 		return np.asarray(state)	
 
 	def set_reward(self, game):
+		self.reward = 0
 		if game.game_over:
 			self.reward = -10
 		elif game.increase_length:
@@ -62,7 +65,7 @@ class DQNAgent:
 
 	def network(self):
 		model = Sequential()
-		model.add(Dense(output_dim=120, activation='relu', input_dim=12))
+		model.add(Dense(output_dim=120, activation='relu', input_dim=13))
 		model.add(Dropout(0.15))
 		model.add(Dense(output_dim=120, activation='relu'))
 		model.add(Dropout(0.15))
@@ -90,8 +93,8 @@ class DQNAgent:
 	def train_model(self, state, action, reward, next_state, done):
 		target = reward
 		if not done:
-			target = reward + self.gamma * np.amax(self.model.predict(next_state.reshape((1, 12)))[0])
-		target_f = self.model.predict(state.reshape((1, 12)))
+			target = reward + self.gamma * np.amax(self.model.predict(next_state.reshape((1, 13)))[0])
+		target_f = self.model.predict(state.reshape((1, 13)))
 		target_f[0][np.argmax(action)] = target
-		self.model.fit(state.reshape((1, 12)), target_f, epochs=1, verbose=0)
+		self.model.fit(state.reshape((1, 13)), target_f, epochs=1, verbose=0)
 	
