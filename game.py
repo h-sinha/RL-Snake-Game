@@ -1,6 +1,9 @@
+from keras.utils import to_categorical
 import pygame
 import random
 import time
+from DQN import DQNAgent
+import numpy as np
 
 pygame.init()
 pygame.font.init()
@@ -8,7 +11,8 @@ pygame.display.set_caption('Snake Game')
 window_width = 440
 window_height = 480
 clock = pygame.time.Clock()
-player = []
+max_score = 0
+agent = DQNAgent()
 
 class Game:
 	def __init__(self, window_width, window_height):
@@ -80,6 +84,7 @@ class Food(pygame.sprite.Sprite):
 		self.x = random.randint(20, window_width-40)
 		self.y = random.randint(20, window_height-80)
 def update_screen():
+	global max_score
 	# increase snake's length on increase in score
 	if game.increase_length:
 		if player[-1].direction == 1:
@@ -95,11 +100,16 @@ def update_screen():
 	game.screen.fill((255, 255, 255))
 
 	# render score
-	myfont = pygame.font.SysFont('Segoe UI', 40)
+	myfont = pygame.font.SysFont('Segoe UI', 20)
+	max_score = max(max_score, game.score)
 	text_score = myfont.render('SCORE: ', True, (0, 0, 0))
 	text_score_number = myfont.render(str(game.score), True, (0, 0, 0))
+	max_score_render = myfont.render('MAX SCORE: ', True, (0, 0, 0))
+	max_score_number = myfont.render(str(max_score), True, (0, 0, 0))
 	game.screen.blit(text_score, (5, window_height-30))
-	game.screen.blit(text_score_number, (120, window_height-30))
+	game.screen.blit(text_score_number, (80, window_height-30))
+	game.screen.blit(max_score_render, (160, window_height-30))
+	game.screen.blit(max_score_number, (300, window_height-30))
 	game.screen.blit(game.background_image, [10, 10])
 	game.screen.blit(food.image, (food.x, food.y))
 	
@@ -115,26 +125,52 @@ def update_screen():
 	game.screen.blit(player[0].image, (player[0].x, player[0].y))
 	pygame.display.update()
 	
-def event_handler(events):
-	for event in events:
-		try:
-			if event.key == pygame.K_UP:
-				player[0].direction = 1
-			elif event.key == pygame.K_DOWN:
-				player[0].direction = 2
-			elif event.key == pygame.K_LEFT:
-				player[0].direction = 3
-			elif event.key == pygame.K_RIGHT:
-				player[0].direction = 4
-		except:
-			pass
-game = Game(window_width, window_height)
-# head of snake
-player.append(Player(game, 0.5 * game.window_width, 0.5 * game.window_height))
-food = Food(game)
-while game.game_over == False:
-	events = pygame.event.get()
-	event_handler(events)
-	update_screen()
-	clock.tick(10)
+def event_handler(player, direction):
+	if direction == 0:
+		return
+	player[0].direction = direction
+
+def init(agent, game, player, food):
+	state_init1 = agent.get_state(game, player, food)  
+	action = [0, 0, 0, 0, 1]
+	event_handler(player, np.argmax(np.array(action)))
+	state_init2 = agent.get_state(game, player, food)
+	reward = agent.set_reward(game)
+	agent.memoize(state_init1, action, reward, state_init2, game)
+	agent.replay_new(agent.memory)
+
+num_games = 0
+while num_games < 1:
+	if num_games > 0:
+		init(agent, game, player, food)
+	num_games += 1
+	player = []
+	game = Game(window_width, window_height)
+	player.append(Player(game, 0.5 * game.window_width, 0.5 * game.window_height))
+	food = Food(game)
+	while game.game_over == False:
+		# for random moves
+		agent.epsilon = 80 - num_games
+		old_state = agent.get_state(game, player, food)
+
+		if random.randint(0, 200) < agent.epsilon:
+			new_direction = to_categorical(random.randint(0, 2), num_classes=5)
+		else:
+			predict = agent.model.predict(old_state.reshape((1,12)))
+			new_direction = to_categorical(np.argmax(predict[0]), num_classes=5)
+             
+		# perform move  
+		event_handler(player, np.argmax(np.array(new_direction)))
+		new_state = agent.get_state(game, player, food)
+        
+		reward = agent.set_reward(game)
+		agent.train_model(old_state, new_direction, reward, new_state, game.game_over)
+
+		update_screen()
+		clock.tick(60)
+		time.sleep(3)
+
+	agent.replay_new(agent.memory)
+	print('Game', num_games, '      Score:', game.score)
+	agent.model.save_weights('weights.hdf5')
 
