@@ -4,6 +4,14 @@ This is an implementation in Keras and Pygame of deep Q-learning applied to the 
 # Requirements
 Refer to [requirements.txt](../master/requirements.txt).
 
+# Instructions
+* Set game speed in line 16 of game.py.
+* The agent uses pretrained model [weights.hdf5](../master/weights.hdf5). For training the model from scratch comment line 78 in DQN.py.
+* Start the game using 
+``` 
+python game.py
+```
+
 # Implementation Details
 
 ### State

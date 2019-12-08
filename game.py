@@ -11,8 +11,9 @@ pygame.display.set_caption('Snake Game')
 window_width = 440
 window_height = 480
 clock = pygame.time.Clock()
-max_score = 36
+max_score = 0
 num_games = 0
+game_speed = 10
 agent = DQNAgent()
 
 class Game:
@@ -173,7 +174,7 @@ while num_games < 500:
 		reward = agent.set_reward(game)
 		agent.train_model(old_state, new_direction, reward, new_state, game.game_over)
 		agent.memoize(old_state, new_direction, reward, new_state, game.game_over)
-		clock.tick(10)
+		clock.tick(game_speed)
 
 	agent.replay_new(agent.memory)
 	print('Game', num_games, '      Score:', game.score)
