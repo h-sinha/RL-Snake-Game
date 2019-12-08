@@ -11,7 +11,8 @@ pygame.display.set_caption('Snake Game')
 window_width = 440
 window_height = 480
 clock = pygame.time.Clock()
-max_score = 0
+max_score = 36
+num_games = 0
 agent = DQNAgent()
 
 class Game:
@@ -74,17 +75,18 @@ class Player:
 class Food(pygame.sprite.Sprite):
 	def __init__(self, game):
 		super().__init__()
-		self.x = random.randint(20, game.window_width-40)
-		self.y = random.randint(20, game.window_height-80)
+		self.x = random.randint(40, game.window_width-60)
+		self.y = random.randint(40, game.window_height-100)
 		self.image = pygame.image.load('images/food.png')
 		self.rect = self.image.get_rect()
 		self.width = 20
 		self.height = 20
 	def update(self):
-		self.x = random.randint(20, window_width-40)
-		self.y = random.randint(20, window_height-80)
+		self.x = random.randint(40, window_width-60)
+		self.y = random.randint(40, window_height-100)
 def update_screen():
 	global max_score
+	global num_games
 	# increase snake's length on increase in score
 	if game.increase_length:
 		if player[-1].direction == 1:
@@ -100,16 +102,20 @@ def update_screen():
 	game.screen.fill((255, 255, 255))
 
 	# render score
-	myfont = pygame.font.SysFont('Segoe UI', 20)
+	myfont = pygame.font.SysFont('Segoe UI', 25)
 	max_score = max(max_score, game.score)
 	text_score = myfont.render('SCORE: ', True, (0, 0, 0))
 	text_score_number = myfont.render(str(game.score), True, (0, 0, 0))
 	max_score_render = myfont.render('MAX SCORE: ', True, (0, 0, 0))
 	max_score_number = myfont.render(str(max_score), True, (0, 0, 0))
+	tot_games = myfont.render('GAME NUMBER: ', True, (0, 0, 0))
+	tot_games_number = myfont.render(str(num_games), True, (0, 0, 0))
 	game.screen.blit(text_score, (5, window_height-30))
 	game.screen.blit(text_score_number, (80, window_height-30))
-	game.screen.blit(max_score_render, (160, window_height-30))
-	game.screen.blit(max_score_number, (300, window_height-30))
+	game.screen.blit(tot_games, (270, window_height-30))
+	game.screen.blit(tot_games_number, (410, window_height-30))
+	game.screen.blit(max_score_render, (120, window_height-30))
+	game.screen.blit(max_score_number, (240, window_height-30))
 	game.screen.blit(game.background_image, [10, 10])
 	game.screen.blit(food.image, (food.x, food.y))
 	
@@ -140,8 +146,7 @@ def init(agent, game, player, food):
 	agent.memoize(state_init1, action, reward, state_init2, game.game_over)
 	agent.replay_new(agent.memory)
 
-num_games = 0
-while num_games < 200:
+while num_games < 500:
 	num_games += 1
 	player = []
 	game = Game(window_width, window_height)
@@ -167,9 +172,8 @@ while num_games < 200:
         
 		reward = agent.set_reward(game)
 		agent.train_model(old_state, new_direction, reward, new_state, game.game_over)
-		# print(reward)
 		agent.memoize(old_state, new_direction, reward, new_state, game.game_over)
-		clock.tick(360)
+		clock.tick(10)
 
 	agent.replay_new(agent.memory)
 	print('Game', num_games, '      Score:', game.score)

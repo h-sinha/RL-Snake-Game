@@ -75,6 +75,7 @@ class DQNAgent:
 		# no change, up, down, left, right
 		model.add(Dense(output_dim=5, activation='softmax'))
 		opt = Adam(self.learning_rate)
+		model.load_weights('weights.hdf5')
 		model.compile(loss='mse', optimizer=opt)
 		return model
 	
