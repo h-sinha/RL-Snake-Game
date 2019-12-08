@@ -14,6 +14,7 @@ clock = pygame.time.Clock()
 max_score = 0
 num_games = 0
 game_speed = 10
+epsilon = 1
 agent = DQNAgent()
 
 class Game:
@@ -156,7 +157,7 @@ while num_games < 500:
 	init(agent, game, player, food)
 	while game.game_over == False:
 		# for random moves
-		agent.epsilon = 80 - num_games
+		agent.epsilon = epsilon - num_games
 		old_state = agent.get_state(game, player, food)
 
 		if random.randint(0, 200) < agent.epsilon:
