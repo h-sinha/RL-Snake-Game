@@ -41,9 +41,19 @@ Tuple with 13 values. Each value if 0/1.
 Initially the player performs random moves for exploration. Later the action to be taken is decided using the deep learning network.
 
 # Results
-### 1st game
-![](../master/images/game1.gif) 
-### 201st game
-![](../master/images/game201.gif) 
+
+<p align="center"> 
+    <img src="../master/images/game1.gif">
+    <br/>
+  <b>1st game</b>
+ </p>
+ <p align="center"> 
+    <img src="../master/images/game201.gif">
+    <br/>
+    <b>201st game</b>
+ </p>
+
+
 * After 100 games the agent consistently scores 15+ points.
-* After 150 game the agent scores 25+ points.
+* After 150 games the agent scores 25+ points.
+* After 175 games the agent scores 35+ points
