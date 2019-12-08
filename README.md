@@ -8,28 +8,42 @@ Refer to [requirements.txt](../master/requirements.txt).
 
 ### State
 
-Tuple with 13 values. Each value if 0/1.
-| S.no  |    Description  				|
-|------	|:---------------------------:	|
-| 0 	|danger above player 			| 
-| 1  	|danger below player    		|  
-| 2  	|danger to the left of player 	|  
-| 3  	|danger to the right of player 	|  
-| 4  	|player moving up 				|  
-| 5  	|player moving down 			|  
-| 6  	|player moving left 			|  
-| 7  	|player moving right 			|  
-| 8  	|food on player's left 			|  
-| 9  	|food on player's right 		|  
-| 10  	|food below player 				|  
-| 11 	|food above player 				|  
-| 12 	|player's direction 			|  
+Tuple with 13 values. Each value if 0/1. 
+
+| index |    Description  			    	  |
+|-------|:-----------------------------:|
+| 0 	  |danger above player 			      | 
+| 1   	|danger below player    		    |  
+| 2   	|danger to the left of player 	|  
+| 3   	|danger to the right of player 	|  
+| 4  	  |player moving up 				      |  
+| 5   	|player moving down 			      |  
+| 6   	|player moving left 			      |  
+| 7   	|player moving right 			      |  
+| 8  	  |food on player's left 		      |  
+| 9  	  |food on player's right 	      |  
+| 10    |food below player 			      	|  
+| 11 	  |food above player 			      	|  
+| 12 	  |player's direction 		      	|  
 
 ### Reward 
-* Food eaten - 10
-* Game over - -10
-* Anything else - 0
+|Action        | Reward |
+|--------------|:------:|
+|Food eaten    | - 10   |
+|Game over     | -10    |
+|Anything else |  0     |
 
 ### DL model
-* 1 input, 1 output and 2 hidden layers.
-* 
+* 1 input layer with 13 neurons.
+* 2 hidden layers each with 120 neurons.
+* 1 output layer with 5 neurons. 5 output neurons as there are 5 possible actions - No change, move up, move down, move left, move right.
+
+Initially the player performs random moves for exploration. Later the action to be taken is decided using the deep learning network.
+
+# Results
+### 1st game
+![](../master/images/game1.gif) 
+### 201st game
+![](../master/images/game201.gif) 
+* After 100 games the agent consistently scores 15+ points.
+* After 150 game the agent scores 25+ points.
