@@ -37,7 +37,7 @@ Tuple with 13 values. Each value if 0/1.
 ### Reward 
 |Action        | Reward |
 |--------------|:------:|
-|Food eaten    | - 10   |
+|Food eaten    |  10   |
 |Game over     | -10    |
 |Anything else |  0     |
 
