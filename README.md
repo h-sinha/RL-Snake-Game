@@ -6,7 +6,7 @@ Refer to [requirements.txt](../master/requirements.txt).
 
 # Instructions
 * Set game speed in line 16 of game.py.
-* The agent uses pretrained model [weights.hdf5](../master/weights.hdf5). For training the model from scratch comment line 78 in DQN.py and set epsilong in line 17 of game.py to 80.
+* The agent uses pretrained model [weights.hdf5](../master/weights.hdf5). For training the model from scratch comment line 78 in DQN.py and set epsilon in line 17 of game.py to 80.
 * Start the game using 
 ``` 
 python game.py
