@@ -16,7 +16,7 @@ python game.py
 
 ### State
 
-Tuple with 13 values. Each value if 0/1. 
+Tuple with 13 values. Each value except direction is 0/1. Direction can take integral values from 0 to 4. 
 
 | index |    Description  			    	  |
 |-------|:-----------------------------:|
